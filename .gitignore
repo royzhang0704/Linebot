@@ -1,0 +1,109 @@
+### Python ###
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.env
+.venv
+env.bak/
+venv.bak/
+
+### Django ###
+*.log
+*.pot
+*.pyc
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media
+
+# If your project uses staticfiles
+staticfiles/
+static/
+
+### IDE ###
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+.idea_modules/
+
+### System Files ###
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+### Project Specific ###
+# Environment variables
+.env
+
+# Local development settings
+local_settings.py
+
+# Database
+*.sqlite3
+
+# Log files
+logs/
+*.log
+
+# Backup files
+*.bak
+*.swp
+*.swo
+
+# Cache
+.cache/# Virtual Environment
+venv/
+ENV/
+.env
+.venv/
+
+# Static files
+staticfiles/
+static/
+
+# Compiled Python files
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
