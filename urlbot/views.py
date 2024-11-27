@@ -38,12 +38,12 @@ class LineBotCallbackAPI(APIView):
         self.parser = WebhookParser(settings.LINE_CHANNEL_SECRET)
         self.shortener = URLShortener()
         self.currency_transform = CurrencyTransformAPI()
-        self.weather = WeatherAPI()
         self.news = NewsAPI()
         self.stock = StockAPI()
         self.weather = WeatherIntegratedAPI()
         self.todolist=TodoList()
 
+        #將使用者輸入的指令映射到此
         self.command_handlers = {
             "縮網址": self._handle_url_shortener,
             "匯率": self._handle_currency,
@@ -56,17 +56,16 @@ class LineBotCallbackAPI(APIView):
     def post(self, request, *args, **kwargs):
         """處理 Line webhook 請求"""
 
-        body = request.body.decode('utf-8')
+        body = request.body.decode('utf-8') #將使用者輸入用utf-8編碼 避免中文變成亂碼
         signature = request.META.get('HTTP_X_LINE_SIGNATURE', '')
 
         try:
             events = self.parser.parse(body, signature)
         except InvalidSignatureError:
-            return Response({'error': 'Invalid signature'},
-                            status=status.HTTP_403_FORBIDDEN)
+            return Response({'error': 'Invalid signature'},status=status.HTTP_403_FORBIDDEN)
+
         except LineBotApiError:
-            return Response({'error': 'LineBotApi error'},
-                            status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'LineBotApi error'},status=status.HTTP_400_BAD_REQUEST)
 
         for event in events:
             if isinstance(event, MessageEvent):
@@ -90,75 +89,85 @@ class LineBotCallbackAPI(APIView):
         Returns:
             str: 處理結果的回覆消息
         """
+        #訊息預處理
         user_message = event.message.text.strip()
         input_parts = user_message.split(" ")
 
         # 尋找對應的指令處理器
-        command = next(
-            (cmd for cmd in self.command_handlers if user_message.startswith(cmd)),
-            None
-        )
+        command=next((cmd for cmd in self.command_handlers if user_message.startswith(cmd)),None)
 
-        if command:
-            try:
-                handler = self.command_handlers[command]
-                # todo 指令需要 user_id
-                if command == "todo":
-                    return handler(input_parts, event.source.user_id)
-                return handler(input_parts)
-            except Exception as error:
-                return error_message(error)
+        #找不到指令
+        if not command:
+            return support_command_message()
 
-        return support_command_message()
+        try:
+            handler = self.command_handlers[command]
+            # todo 指令需要 透過user_id 將資料保存到資料庫
+            if command == "todo":
+                return handler(input_parts,event.source.user_id)
+            return handler(input_parts)
+        except Exception as error:
+            return error_message(error)
 
-    def _handle_url_shortener(self, parts):
+    def _handle_url_shortener(self, input_parts):
         """處理縮網址指令"""
-        if len(parts) < 2:
-            return "請提供需要縮短的網址 例如: 縮網址 https://example.com"
+        if len(input_parts) < 2:
+            return ("請輸入正確的縮網址格式\n"
+                    "   說明: 將長網址轉換為短網址\n"
+                    "   格式: 縮網址 [URL]\n"
+                    "   範例: 縮網址 https://www.google.com.tw/"
+                )
 
-        response = self.shortener.get_shorten_url(parts[1])
+        response = self.shortener.get_shorten_url(input_parts[1])
         return response if isinstance(response, str) else f"對應的縮網址：{response}"
 
-    def _handle_currency(self,input):
+    def _handle_currency(self,input_part):
         """處理匯率指令"""
         if len(input) < 3:
             return "請輸入正確格式 匯率 [原幣別] [目標幣別] 例如 美金 台幣",
-        currency1, currency2 = input[1],input[2]
+        currency1, currency2 = input_part[1],input_part[2]
         response = self.currency_transform.get_result(currency1, currency2)
         return response if isinstance(response,str) else f"當前 1 {currency1} 可以兌換 {response} {currency2}"
 
-    def _handle_stock(self,input):
+    def _handle_stock(self,input_part):
         """處理股票指令"""
-        if len(input) < 2:  # 檢查輸入長度
+        if len(input_part) < 2:  # 檢查輸入長度
             return "請輸入股票代碼 例如 股票 2330"
 
-        if not input[1]:
+        if not input_part[1]:
             return support_command_message()
 
-        if input[1] == "外資持股":
+        if input_part[1] == "外資持股":
             return  self.stock.get_foreign_holdings_info()
 
-        elif input[1] == "每日成交":
+        elif input_part[1] == "每日成交":
             return self.stock.get_MI_INDEX20()
 
         else:
-            return self.stock.get_stock_full_info(input[1])
+            return self.stock.get_stock_full_info(input_part[1])
 
     def _handle_weather(self, input):
         """處理天氣指令"""
         if len(input) < 2:
-            return "請輸入要查詢的縣市地點\n範例：天氣 臺北"
+            return (
+                "請輸入要查詢的縣市名稱\n"
+                "範例：天氣 臺北市\n"
+                "支援查詢的縣市：\n"
+                "北部：臺北市、新北市、基隆市、桃園市、新竹市、新竹縣\n"
+                "中部：臺中市、南投縣、彰化縣\n"
+                "南部：嘉義市、嘉義縣、臺南市、高雄市、屏東縣\n"
+                "東部：宜蘭縣、花蓮縣、臺東縣\n"
+                "外島：澎湖縣、金門縣、連江縣"
+            )
 
         location_name = input[1].strip()
-        if not location_name:
-            return "請輸入有效的縣市地點名稱\n範例：天氣 臺北"
 
         return self.weather.get_weather_info(location_name)
 
     def _handle_news(self,input):
         """處理新聞指令"""
         if len(input)<2:
-            return "請輸入要查詢的新聞關鍵字 例如 新聞 奧運"
+            return "請輸入要查詢的新聞關鍵字 例如 新聞 棒球"
         keyword=input[1]
         return self.news.get_new_article(keyword)
 
@@ -303,7 +312,7 @@ class CurrencyTransformAPI:
         '英鎊': 'GBP',
         '韓元': 'KRW',
     }
-        self.support_text="美金,台幣,日幣,人民幣,越南盾,英鎊,韓元"
+        self.support_text="美金,台幣,日幣,人民幣,越南盾,英鎊,韓元" #未來更好擴充 不要用應編碼
     def _validate_input(self,input1,input2):
         """驗整輸入在支援內"""
         if input1 not in self.text or input2 not in self.text:
@@ -579,7 +588,6 @@ class StockAPI:
     def __init__(self):
         self.url_fund_MI_QFIIS_sort_20 = "https://openapi.twse.com.tw/v1/fund/MI_QFIIS_sort_20"  # 集中市場外資及陸資持股前5名統計表 ok
         self.url_MI_INDEX20="https://openapi.twse.com.tw/v1/exchangeReport/MI_INDEX20" #集中市場每日成交量前5名證券 ok
-        self.url3="https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"#上市個股日成交資訊
         self.url_BWIBBU_ALL="https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL" #個股基本資料(含收盤價、本益比、股價淨值比)
         self.url_STOCK_DAY_ALL= "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"# 個股日成交資訊
 
@@ -997,26 +1005,6 @@ class WeatherIntegratedAPI:
 
         return message
 
-def _handle_weather(self, input):
-    """處理天氣指令"""
-    if len(input) < 2:
-        return (
-            "請輸入要查詢的縣市名稱\n"
-            "範例：天氣 臺北市\n"
-            "支援查詢的縣市：\n"
-            "北部：臺北市、新北市、基隆市、桃園市、新竹市、新竹縣\n"
-            "中部：臺中市、南投縣、彰化縣\n"
-            "南部：嘉義市、嘉義縣、臺南市、高雄市、屏東縣\n"
-            "東部：宜蘭縣、花蓮縣、臺東縣\n"
-            "外島：澎湖縣、金門縣、連江縣"
-        )
-
-    location_name = input[1].strip()
-    if not location_name:
-        return "請輸入有效的縣市名稱"
-
-    return self.weather.get_weather_info(location_name)
-
 def support_command_message():
     """顯示所有支援的指令說明
 
@@ -1097,7 +1085,7 @@ def support_command_message():
 
     return message
 
-def error_message(message: str):
+def error_message(message):
     """格式化錯誤訊息
 
     將系統錯誤訊息轉換為用戶友善的格式。
@@ -1115,7 +1103,7 @@ def error_message(message: str):
             "❌ 發生錯誤\n"
             "=" * 20 + "\n"
             f"錯誤描述: {message}\n"
-            "請稍後再試，或聯繫客服尋求協助。\n"
+            "請稍後再試。\n"
             "=" * 20
     )
     return error_template

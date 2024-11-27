@@ -1,0 +1,108 @@
+{
+    "api_info": {
+        "name": "集中市場外資及陸資持股前20名 API",
+        "base_url": "https://openapi.twse.com.tw/v1/fund/MI_QFIIS_sort_20",
+        "description": "取得台灣證券交易所集中市場外資及陸資持股前20名資料",
+        "version": "1.0",
+        "authentication": "不需要認證",
+        "update_frequency": "每日更新"
+    },
+
+    "request": {
+        "method": "GET",
+        "parameters": "無需參數"
+    },
+
+    "response": {
+        "success_response": {
+            "code": 200,
+            "data_format": {
+                "Rank": {
+                    "type": "string",
+                    "description": "排名",
+                    "example": "1"
+                },
+                "Code": {
+                    "type": "string",
+                    "description": "股票代碼",
+                    "example": "2330"
+                },
+                "Name": {
+                    "type": "string",
+                    "description": "股票名稱",
+                    "example": "台積電"
+                },
+                "ShareNumber": {
+                    "type": "string",
+                    "description": "總股數",
+                    "example": "25930380000"
+                },
+                "AvailableShare": {
+                    "type": "string",
+                    "description": "可投資股數",
+                    "example": "25930380000"
+                },
+                "SharesHeld": {
+                    "type": "string",
+                    "description": "已投資股數",
+                    "example": "15439492000"
+                },
+                "AvailableInvestPer": {
+                    "type": "string",
+                    "description": "可投資比例(%)",
+                    "example": "100.00"
+                },
+                "SharesHeldPer": {
+                    "type": "string",
+                    "description": "已投資比例(%)",
+                    "example": "59.54"
+                },
+                "Upperlimit": {
+                    "type": "string",
+                    "description": "投資上限比例(%)",
+                    "example": "100.00"
+                }
+            },
+            "example_response": [
+                {
+                    "Rank": "1",
+                    "Code": "2330",
+                    "Name": "台積電",
+                    "ShareNumber": "25930380000",
+                    "AvailableShare": "25930380000",
+                    "SharesHeld": "15439492000",
+                    "AvailableInvestPer": "100.00",
+                    "SharesHeldPer": "59.54",
+                    "Upperlimit": "100.00"
+                }
+            ]
+        },
+        "error_responses": {
+            "404": {
+                "description": "找不到資源",
+                "example": {
+                    "error": "Resource not found"
+                }
+            },
+            "429": {
+                "description": "請求次數超過限制",
+                "example": {
+                    "error": "Too many requests"
+                }
+            },
+            "500": {
+                "description": "服務器內部錯誤",
+                "example": {
+                    "error": "Internal server error"
+                }
+            }
+        }
+    },
+
+    "usage_examples": {
+        "python_example": {
+            "description": "使用 Python 獲取外資持股資料",
+            "code": "import requests\n\nresponse = requests.get('https://openapi.twse.com.tw/v1/fund/MI_QFIIS_sort_20')\ndata = response.json()"
+        }
+    }
+}

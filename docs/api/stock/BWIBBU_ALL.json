@@ -1,0 +1,151 @@
+{
+    "api_info": {
+        "name": "個股本益比、殖利率及淨值比 API",
+        "base_url": "https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL",
+        "description": "取得所有上市個股的本益比、殖利率及淨值比資訊",
+        "method": "GET",
+        "update_frequency": "每日更新",
+        "data_delay": "20分鐘"
+    },
+
+    "request": {
+        "method": "GET",
+        "parameters": "無需參數",
+        "authentication": "無需認證"
+    },
+
+    "response": {
+        "data_type": "array",
+        "data_format": {
+            "Code": {
+                "type": "string",
+                "description": "股票代號",
+                "example": "2330"
+            },
+            "Name": {
+                "type": "string",
+                "description": "股票名稱",
+                "example": "台積電"
+            },
+            "PEratio": {
+                "type": "string",
+                "description": "本益比",
+                "example": "18.32",
+                "notes": "若為「-」表示無本益比資料"
+            },
+            "DividendYield": {
+                "type": "string",
+                "description": "殖利率(%)",
+                "example": "2.31",
+                "notes": "若為「-」表示無殖利率資料"
+            },
+            "PBratio": {
+                "type": "string",
+                "description": "股價淨值比",
+                "example": "5.53",
+                "notes": "若為「-」表示無股價淨值比資料"
+            }
+        },
+
+        "example_response": [
+            {
+                "Code": "2330",
+                "Name": "台積電",
+                "PEratio": "18.32",
+                "DividendYield": "2.31",
+                "PBratio": "5.53"
+            },
+            {
+                "Code": "2317",
+                "Name": "鴻海",
+                "PEratio": "12.45",
+                "DividendYield": "4.52",
+                "PBratio": "1.23"
+            }
+        ]
+    },
+
+    "error_responses": {
+        "404": {
+            "description": "找不到資源",
+            "example": {
+                "error": "Resource not found"
+            }
+        },
+        "429": {
+            "description": "請求次數超過限制",
+            "example": {
+                "error": "Too many requests"
+            }
+        },
+        "500": {
+            "description": "服務器內部錯誤",
+            "example": {
+                "error": "Internal server error"
+            }
+        }
+    },
+
+    "field_descriptions": {
+        "PEratio": {
+            "description": "本益比 (Price-to-Earnings Ratio)",
+            "calculation": "股價 / 每股盈餘",
+            "notes": [
+                "反映股價高低與獲利的關係",
+                "數值越低表示投資價值越高",
+                "可能為負值或無資料（顯示為「-」）"
+            ]
+        },
+        "DividendYield": {
+            "description": "殖利率 (Dividend Yield)",
+            "calculation": "現金股利 / 股價 x 100%",
+            "notes": [
+                "反映投資報酬率",
+                "數值越高表示配息率越高",
+                "若公司未配發股利則無資料（顯示為「-」）"
+            ]
+        },
+        "PBratio": {
+            "description": "股價淨值比 (Price-to-Book Ratio)",
+            "calculation": "股價 / 每股淨值",
+            "notes": [
+                "反映股價與公司價值的關係",
+                "數值低於1表示股價低於帳面價值",
+                "可能無資料（顯示為「-」）"
+            ]
+        }
+    },
+
+    "notes": {
+        "data_format": {
+            "數值格式": "所有數值皆為字串格式",
+            "缺值表示": "使用「-」表示無資料",
+            "數字精度": "小數點後兩位"
+        },
+        "special_cases": [
+            "新上市公司可能部分指標無資料",
+            "虧損公司的本益比可能為負值或無資料",
+            "未配發股利的公司無殖利率資料"
+        ],
+        "calculation_basis": {
+            "本益比": "以最近四季稅後盈餘計算",
+            "殖利率": "以最近一年現金股利計算",
+            "股價淨值比": "以最近期財報淨值計算"
+        }
+    },
+
+    "usage_tips": {
+        "best_practices": [
+            "建議實作快取機制，減少重複請求",
+            "數值運算前需要先檢查是否為「-」",
+            "建議與其他財務資料API配合使用",
+            "可用於股票篩選及價值分析"
+        ],
+        "application_scenarios": {
+            "value_investment": "用於價值型投資分析",
+            "dividend_investment": "用於股息投資策略",
+            "stock_screening": "用於股票初步篩選",
+            "market_analysis": "用於市場整體評估"
+        }
+    }
+}

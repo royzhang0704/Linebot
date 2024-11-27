@@ -36,7 +36,7 @@ SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS =['44c1-223-141-47-54.ngrok-free.app', #ngrok
+ALLOWED_HOSTS =['cafd-2401-e180-8892-b32e-4c8f-5550-b955-f732.ngrok-free.app', #ngrok
                 'localhost',
                 ]
 

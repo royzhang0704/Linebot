@@ -1,0 +1,93 @@
+{
+    "text_message": {
+        "description": "回覆文字消息",
+        "format": {
+            "type": "text",
+            "text": "回覆內容",
+            "quoteToken": "引用的消息token（選填）"
+        },
+        "example": {
+            "type": "text",
+            "text": "Hello, this is a response!"
+        }
+    },
+    "template_message": {
+        "description": "按鈕模板消息",
+        "format": {
+            "type": "template",
+            "altText": "替代文字",
+            "template": {
+                "type": "buttons",
+                "title": "標題（選填）",
+                "text": "內容說明",
+                "actions": [
+                    {
+                        "type": "message|uri|postback",
+                        "label": "按鈕文字",
+                        "text|uri|data": "對應的值"
+                    }
+                ]
+            }
+        },
+        "example": {
+            "type": "template",
+            "altText": "功能選單",
+            "template": {
+                "type": "buttons",
+                "title": "主選單",
+                "text": "請選擇功能",
+                "actions": [
+                    {
+                        "type": "message",
+                        "label": "查詢天氣",
+                        "text": "天氣 台北"
+                    },
+                    {
+                        "type": "message",
+                        "label": "股票資訊",
+                        "text": "股票 2330"
+                    }
+                ]
+            }
+        }
+    },
+    "flex_message": {
+        "description": "Flex 消息（可自定義布局）",
+        "format": {
+            "type": "flex",
+            "altText": "替代文字",
+            "contents": {
+                "type": "bubble",
+                "header": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": []
+                },
+                "body": {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": []
+                }
+            }
+        }
+    },
+    "quick_reply": {
+        "description": "快速回覆按鈕",
+        "format": {
+            "type": "text",
+            "text": "請選擇",
+            "quickReply": {
+                "items": [
+                    {
+                        "type": "action",
+                        "action": {
+                            "type": "message",
+                            "label": "按鈕文字",
+                            "text": "回傳文字"
+                        }
+                    }
+                ]
+            }
+        }
+    }
+}

@@ -1,0 +1,86 @@
+{
+    "message_event": {
+        "description": "收到用戶發送的消息",
+        "format": {
+            "type": "message",
+            "replyToken": "回覆令牌",
+            "mode": "active",
+            "timestamp": 1462629479859,
+            "source": {
+                "type": "user",
+                "userId": "使用者ID"
+            },
+            "message": {
+                "id": "消息ID",
+                "type": "text",
+                "text": "消息內容"
+            }
+        },
+        "example": {
+            "type": "message",
+            "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+            "mode": "active",
+            "timestamp": 1462629479859,
+            "source": {
+                "type": "user",
+                "userId": "U4af4980629..."
+            },
+            "message": {
+                "id": "325708",
+                "type": "text",
+                "text": "Hello, world!"
+            }
+        }
+    },
+    "follow_event": {
+        "description": "用戶追蹤 LINE 官方帳號",
+        "format": {
+            "type": "follow",
+            "replyToken": "回覆令牌",
+            "mode": "active",
+            "timestamp": 1462629479859,
+            "source": {
+                "type": "user",
+                "userId": "使用者ID"
+            }
+        },
+        "example": {
+            "type": "follow",
+            "replyToken": "nHuyWiB7yP5Zw52FIkcQobQuGDXCTA",
+            "mode": "active",
+            "timestamp": 1462629479859,
+            "source": {
+                "type": "user",
+                "userId": "U4af4980629..."
+            }
+        }
+    },
+    "unfollow_event": {
+        "description": "用戶取消追蹤",
+        "format": {
+            "type": "unfollow",
+            "mode": "active",
+            "timestamp": 1462629479859,
+            "source": {
+                "type": "user",
+                "userId": "使用者ID"
+            }
+        }
+    },
+    "postback_event": {
+        "description": "用戶點擊按鈕或選單時的回傳事件",
+        "format": {
+            "type": "postback",
+            "replyToken": "回覆令牌",
+            "mode": "active",
+            "timestamp": 1462629479859,
+            "source": {
+                "type": "user",
+                "userId": "使用者ID"
+            },
+            "postback": {
+                "data": "action=buy&itemid=123"
+            }
+        }
+    }
+}

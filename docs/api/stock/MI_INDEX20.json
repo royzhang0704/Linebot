@@ -1,0 +1,145 @@
+{
+    "api_info": {
+        "name": "集中市場每日成交量前20名 API",
+        "base_url": "https://openapi.twse.com.tw/v1/exchangeReport/MI_INDEX20",
+        "description": "取得集中市場每日成交量前20名證券資訊",
+        "method": "GET",
+        "update_frequency": "每日更新",
+        "data_delay": "20分鐘"
+    },
+
+    "request": {
+        "method": "GET",
+        "parameters": "無需參數",
+        "authentication": "無需認證"
+    },
+
+    "response": {
+        "data_type": "array",
+        "data_format": {
+            "Rank": {
+                "type": "string",
+                "description": "排名"
+            },
+            "Code": {
+                "type": "string",
+                "description": "股票代號"
+            },
+            "Name": {
+                "type": "string",
+                "description": "股票名稱"
+            },
+            "TradeVolume": {
+                "type": "string",
+                "description": "成交股數"
+            },
+            "Transaction": {
+                "type": "string",
+                "description": "成交筆數"
+            },
+            "TradeValue": {
+                "type": "string",
+                "description": "成交金額"
+            },
+            "OpeningPrice": {
+                "type": "string",
+                "description": "開盤價"
+            },
+            "HighestPrice": {
+                "type": "string",
+                "description": "最高價"
+            },
+            "LowestPrice": {
+                "type": "string",
+                "description": "最低價"
+            },
+            "ClosingPrice": {
+                "type": "string",
+                "description": "收盤價"
+            },
+            "Dir": {
+                "type": "string",
+                "description": "漲跌符號",
+                "possible_values": ["+", "-", " "]
+            },
+            "Change": {
+                "type": "string",
+                "description": "漲跌金額"
+            },
+            "LastBestBidPrice": {
+                "type": "string",
+                "description": "最後揭示買價"
+            },
+            "LastBestBidVolume": {
+                "type": "string",
+                "description": "最後揭示買量"
+            },
+            "LastBestAskPrice": {
+                "type": "string",
+                "description": "最後揭示賣價"
+            },
+            "LastBestAskVolume": {
+                "type": "string",
+                "description": "最後揭示賣量"
+            },
+            "PERatio": {
+                "type": "string",
+                "description": "本益比"
+            }
+        },
+
+        "example_response": [
+            {
+                "Rank": "1",
+                "Code": "2330",
+                "Name": "台積電",
+                "TradeVolume": "38,245,127",
+                "Transaction": "51,889",
+                "TradeValue": "23,132,452,589",
+                "OpeningPrice": "601.00",
+                "HighestPrice": "606.00",
+                "LowestPrice": "601.00",
+                "ClosingPrice": "605.00",
+                "Dir": "+",
+                "Change": "2.00",
+                "LastBestBidPrice": "605.00",
+                "LastBestBidVolume": "999",
+                "LastBestAskPrice": "606.00",
+                "LastBestAskVolume": "1,249",
+                "PERatio": "18.32"
+            }
+        ]
+    },
+
+    "error_responses": {
+        "404": {
+            "description": "找不到資源",
+            "example": {
+                "error": "Resource not found"
+            }
+        },
+        "429": {
+            "description": "請求次數超過限制",
+            "example": {
+                "error": "Too many requests"
+            }
+        },
+        "500": {
+            "description": "服務器內部錯誤",
+            "example": {
+                "error": "Internal server error"
+            }
+        }
+    },
+
+    "notes": {
+        "data_format": "所有數值皆為字串格式",
+        "number_format": "數值包含千分位符號",
+        "time_zone": "時間以台北時區（UTC+8）為準",
+        "special_cases": [
+            "當股票暫停交易時，部分欄位可能為空值",
+            "Dir 欄位為空字串時表示股價無變動",
+            "若該股票當日未成交，則不會出現在列表中"
+        ]
+    }
+}

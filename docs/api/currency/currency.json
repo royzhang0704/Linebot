@@ -1,0 +1,164 @@
+{
+    "api_info": {
+        "name": "全球即時匯率轉換 API",
+        "base_url": "https://tw.rter.info/capi.php",
+        "description": "提供全球主要貨幣即時匯率資訊",
+        "method": "GET",
+        "update_frequency": "每日更新",
+        "authentication": "無需認證"
+    },
+
+    "request": {
+        "method": "GET",
+        "parameters": "無需參數"
+    },
+
+    "response": {
+        "data_type": "object",
+        "data_format": {
+            "USDTWD": {
+                "type": "object",
+                "description": "美元對台幣匯率",
+                "properties": {
+                    "Exrate": {
+                        "type": "float",
+                        "description": "匯率值",
+                        "example": 31.123
+                    },
+                    "UTC": {
+                        "type": "string",
+                        "description": "更新時間",
+                        "example": "2024-01-20 12:34:56"
+                    }
+                }
+            },
+            "USDJPY": {
+                "type": "object",
+                "description": "美元對日圓匯率",
+                "properties": {
+                    "Exrate": {
+                        "type": "float",
+                        "description": "匯率值",
+                        "example": 148.45
+                    },
+                    "UTC": {
+                        "type": "string",
+                        "description": "更新時間"
+                    }
+                }
+            },
+            "USDCNY": {
+                "type": "object",
+                "description": "美元對人民幣匯率",
+                "properties": {
+                    "Exrate": {
+                        "type": "float",
+                        "description": "匯率值",
+                        "example": 7.2154
+                    },
+                    "UTC": {
+                        "type": "string",
+                        "description": "更新時間"
+                    }
+                }
+            }
+        },
+
+        "example_response": {
+            "USDTWD": {
+                "Exrate": 31.123,
+                "UTC": "2024-01-20 12:34:56"
+            },
+            "USDJPY": {
+                "Exrate": 148.45,
+                "UTC": "2024-01-20 12:34:56"
+            },
+            "USDCNY": {
+                "Exrate": 7.2154,
+                "UTC": "2024-01-20 12:34:56"
+            }
+        }
+    },
+
+    "supported_currencies": {
+        "USD": "美元",
+        "TWD": "台幣",
+        "JPY": "日圓",
+        "CNY": "人民幣",
+        "VND": "越南盾",
+        "GBP": "英鎊",
+        "KRW": "韓元"
+    },
+
+    "error_responses": {
+        "404": {
+            "description": "找不到資源",
+            "example": {
+                "error": "Resource not found"
+            }
+        },
+        "429": {
+            "description": "請求次數超過限制",
+            "example": {
+                "error": "Too many requests"
+            }
+        },
+        "500": {
+            "description": "服務器內部錯誤",
+            "example": {
+                "error": "Internal server error"
+            }
+        }
+    },
+
+    "usage_notes": {
+        "data_format": {
+            "匯率格式": "浮點數",
+            "時間格式": "UTC 時間字串",
+            "貨幣代碼": "使用國際標準貨幣代碼"
+        },
+        "currency_conversion": {
+            "base_currency": "所有匯率以美元(USD)為基準",
+            "conversion_formula": {
+                "description": "跨貨幣轉換公式",
+                "formula": "匯率A / 匯率B = 貨幣B對貨幣A的匯率",
+                "example": "TWD/JPY = USDTWD.Exrate / USDJPY.Exrate"
+            }
+        },
+        "rate_limits": {
+            "description": "API 呼叫頻率限制",
+            "limit": "建議間隔至少 1 秒"
+        }
+    },
+
+    "best_practices": {
+        "caching": [
+            "建議實作本地快取",
+            "快取時間建議不超過 10 分鐘",
+            "需要即時匯率時再呼叫 API"
+        ],
+        "error_handling": [
+            "檢查返回數據是否完整",
+            "實作錯誤重試機制",
+            "處理網路連接問題"
+        ],
+        "conversion": [
+            "注意匯率精度問題",
+            "跨貨幣轉換時使用正確公式",
+            "考慮匯率更新時間"
+        ]
+    },
+
+    "notes": {
+        "limitations": [
+            "匯率可能有延遲",
+            "不是所有貨幣組合都可用",
+            "可能受到網路狀況影響"
+        ],
+        "data_accuracy": [
+            "匯率僅供參考",
+            "實際交易匯率可能不同",
+            "建議與其他來源交叉比對"
+        ]
+    }
+}

@@ -1,0 +1,163 @@
+{
+    "api_info": {
+        "name": "Bitly URL Shortening API",
+        "base_url": "https://api-ssl.bitly.com/v4/shorten",
+        "description": "將長網址轉換為短網址的 API",
+        "version": "v4",
+        "authentication": "需要 Bearer Token 認證"
+    },
+
+    "request": {
+        "method": "POST",
+        "headers": {
+            "Authorization": {
+                "type": "string",
+                "format": "Bearer YOUR_ACCESS_TOKEN",
+                "required": true,
+                "description": "API 認證 Token"
+            },
+            "Content-Type": {
+                "type": "string",
+                "value": "application/json",
+                "required": true
+            }
+        },
+        "body": {
+            "type": "application/json",
+            "fields": {
+                "long_url": {
+                    "type": "string",
+                    "required": true,
+                    "description": "要縮短的原始網址",
+                    "example": "https://www.example.com/very/long/url"
+                },
+                "domain": {
+                    "type": "string",
+                    "required": false,
+                    "description": "自定義網域（可選）",
+                    "default": "bit.ly"
+                }
+            },
+            "example": {
+                "long_url": "https://www.example.com/very/long/url",
+                "domain": "bit.ly"
+            }
+        }
+    },
+
+    "response": {
+        "success_response": {
+            "status_code": 200,
+            "content_type": "application/json",
+            "fields": {
+                "created_at": {
+                    "type": "string",
+                    "description": "短網址創建時間",
+                    "format": "ISO 8601 datetime"
+                },
+                "id": {
+                    "type": "string",
+                    "description": "短網址的唯一標識符"
+                },
+                "link": {
+                    "type": "string",
+                    "description": "生成的短網址"
+                },
+                "custom_bitlinks": {
+                    "type": "array",
+                    "description": "自定義短網址列表"
+                },
+                "long_url": {
+                    "type": "string",
+                    "description": "原始長網址"
+                }
+            },
+            "example": {
+                "created_at": "2024-01-20T15:23:10+0000",
+                "id": "bit.ly/example123",
+                "link": "https://bit.ly/example123",
+                "custom_bitlinks": [],
+                "long_url": "https://www.example.com/very/long/url"
+            }
+        },
+        "error_responses": {
+            "400": {
+                "description": "請求格式錯誤",
+                "example": {
+                    "message": "Invalid request body",
+                    "errors": [
+                        {
+                            "field": "long_url",
+                            "message": "長網址格式無效"
+                        }
+                    ]
+                }
+            },
+            "401": {
+                "description": "認證失敗",
+                "example": {
+                    "message": "Invalid token"
+                }
+            },
+            "403": {
+                "description": "無權限訪問",
+                "example": {
+                    "message": "Access forbidden"
+                }
+            },
+            "429": {
+                "description": "請求次數超過限制",
+                "example": {
+                    "message": "Rate limit exceeded"
+                }
+            },
+            "500": {
+                "description": "服務器內部錯誤",
+                "example": {
+                    "message": "Internal server error"
+                }
+            }
+        }
+    },
+
+    "rate_limits": {
+        "description": "API 使用限制",
+        "free_tier": {
+            "requests_per_hour": 1000,
+            "requests_per_month": 10000
+        },
+        "note": "超過限制需要升級付費方案"
+    },
+
+    "usage_examples": {
+        "curl": {
+            "description": "使用 curl 發送請求",
+            "example": "curl -X POST -H 'Authorization: Bearer YOUR_TOKEN' -H 'Content-Type: application/json' -d '{\"long_url\":\"https://example.com\"}' https://api-ssl.bitly.com/v4/shorten"
+        },
+        "python": {
+            "description": "使用 Python requests 發送請求",
+            "example": {
+                "code": "import requests\n\nheaders = {\n    'Authorization': 'Bearer YOUR_TOKEN',\n    'Content-Type': 'application/json'\n}\n\ndata = {\n    'long_url': 'https://example.com'\n}\n\nresponse = requests.post('https://api-ssl.bitly.com/v4/shorten', headers=headers, json=data)"
+            }
+        }
+    },
+
+    "notes": {
+        "security": [
+            "Token 不要寫在代碼中",
+            "建議使用環境變量存儲 Token",
+            "定期更換 Token"
+        ],
+        "best_practices": [
+            "實作錯誤重試機制",
+            "檢查網址格式是否正確",
+            "實作緩存機制避免重複請求",
+            "注意 rate limits"
+        ],
+        "limitations": [
+            "某些網址可能無法縮短",
+            "短網址長度有限制",
+            "可能受到地區限制"
+        ]
+    }
+}

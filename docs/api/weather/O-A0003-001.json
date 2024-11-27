@@ -1,0 +1,250 @@
+{
+    "api_info": {
+        "name": "中央氣象署自動氣象站-氣象觀測資料",
+        "base_url": "https://opendata.cwa.gov.tw/api/v1/rest/datastore/O-A0003-001",
+        "description": "取得中央氣象署自動氣象站資料",
+        "version": "v1",
+        "authentication": "需要 API 授權碼"
+    },
+
+    "request": {
+        "method": "GET",
+        "parameters": {
+            "Authorization": {
+                "type": "string",
+                "required": true,
+                "description": "API 授權碼",
+                "in": "query"
+            },
+            "locationName": {
+                "type": "string",
+                "required": false,
+                "description": "測站名稱，例如：臺北",
+                "in": "query"
+            },
+            "elementName": {
+                "type": "string",
+                "required": false,
+                "description": "觀測項目",
+                "in": "query"
+            }
+        }
+    },
+
+    "response": {
+        "success": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "description": "請求是否成功"
+                },
+                "result": {
+                    "type": "object",
+                    "properties": {
+                        "resource_id": {
+                            "type": "string",
+                            "description": "資料集編號"
+                        },
+                        "fields": {
+                            "type": "array",
+                            "description": "欄位資訊"
+                        }
+                    }
+                },
+                "records": {
+                    "type": "object",
+                    "properties": {
+                        "Station": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "StationID": {
+                                        "type": "string",
+                                        "description": "測站ID"
+                                    },
+                                    "StationName": {
+                                        "type": "string",
+                                        "description": "測站名稱"
+                                    },
+                                    "StationNameEN": {
+                                        "type": "string",
+                                        "description": "測站英文名稱"
+                                    },
+                                    "ObsTime": {
+                                        "type": "object",
+                                        "properties": {
+                                            "DateTime": {
+                                                "type": "string",
+                                                "description": "觀測時間"
+                                            }
+                                        }
+                                    },
+                                    "WeatherElement": {
+                                        "type": "object",
+                                        "properties": {
+                                            "Weather": {
+                                                "type": "string",
+                                                "description": "天氣現象"
+                                            },
+                                            "AirTemperature": {
+                                                "type": "string",
+                                                "description": "氣溫(°C)"
+                                            },
+                                            "RelativeHumidity": {
+                                                "type": "string",
+                                                "description": "相對濕度(%)"
+                                            },
+                                            "WindSpeed": {
+                                                "type": "string",
+                                                "description": "風速(m/s)"
+                                            },
+                                            "WindDirection": {
+                                                "type": "string",
+                                                "description": "風向(度)"
+                                            },
+                                            "UVIndex": {
+                                                "type": "string",
+                                                "description": "紫外線指數"
+                                            },
+                                            "Now": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "Precipitation": {
+                                                        "type": "string",
+                                                        "description": "降雨量(毫米)"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "example": {
+            "success": "true",
+            "records": {
+                "Station": [
+                    {
+                        "StationID": "466920",
+                        "StationName": "臺北",
+                        "StationNameEN": "Taipei",
+                        "ObsTime": {
+                            "DateTime": "2024-01-20T14:00:00+08:00"
+                        },
+                        "WeatherElement": {
+                            "Weather": "晴",
+                            "AirTemperature": "25.2",
+                            "RelativeHumidity": "68",
+                            "WindSpeed": "2.1",
+                            "WindDirection": "45",
+                            "UVIndex": "3",
+                            "Now": {
+                                "Precipitation": "0.0"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    },
+
+    "error_responses": {
+        "401": {
+            "description": "認證失敗",
+            "example": {
+                "message": "Invalid API key"
+            }
+        },
+        "404": {
+            "description": "找不到資源",
+            "example": {
+                "message": "Resource not found"
+            }
+        },
+        "429": {
+            "description": "請求次數超過限制",
+            "example": {
+                "message": "Too many requests"
+            }
+        },
+        "500": {
+            "description": "服務器內部錯誤",
+            "example": {
+                "message": "Internal server error"
+            }
+        }
+    },
+
+    "stations": {
+        "northern": {
+            "description": "北部測站",
+            "stations": [
+                {"name": "臺北", "id": "466920"},
+                {"name": "板橋", "id": "466880"},
+                {"name": "基隆", "id": "466940"}
+            ]
+        },
+        "central": {
+            "description": "中部測站",
+            "stations": [
+                {"name": "臺中", "id": "467490"},
+                {"name": "日月潭", "id": "467650"}
+            ]
+        },
+        "southern": {
+            "description": "南部測站",
+            "stations": [
+                {"name": "臺南", "id": "467410"},
+                {"name": "高雄", "id": "467440"}
+            ]
+        },
+        "eastern": {
+            "description": "東部測站",
+            "stations": [
+                {"name": "花蓮", "id": "466990"},
+                {"name": "臺東", "id": "467660"}
+            ]
+        }
+    },
+
+    "notes": {
+        "update_frequency": "每小時更新一次",
+        "time_zone": "時間為台北時區(UTC+8)",
+        "data_format": {
+            "temperature": "攝氏溫度",
+            "humidity": "百分比",
+            "wind_speed": "公尺/秒",
+            "wind_direction": "度",
+            "precipitation": "毫米"
+        },
+        "limitations": [
+            "每分鐘請求次數限制",
+            "部分測站可能缺少某些觀測資料",
+            "觀測時間可能有延遲"
+        ]
+    },
+
+    "usage_tips": {
+        "caching": [
+            "建議實作本地快取",
+            "快取時間建議 10-30 分鐘",
+            "特殊天氣情況下考慮縮短快取時間"
+        ],
+        "error_handling": [
+            "處理 API 認證錯誤",
+            "處理無資料情況",
+            "處理網路連接問題"
+        ],
+        "data_processing": [
+            "注意數值單位轉換",
+            "處理缺失資料",
+            "時間格式轉換"
+        ]
+    }
+}

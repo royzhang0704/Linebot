@@ -1,0 +1,163 @@
+{
+    "api_info": {
+        "name": "Line Bot TodoList API",
+        "description": "Line Bot 待辦事項管理 API",
+        "version": "1.0",
+        "base_command": "todo"
+    },
+
+    "data_model": {
+        "model_name": "Todolist",
+        "fields": {
+            "title": {
+                "type": "string",
+                "max_length": 50,
+                "description": "待辦事項名稱",
+                "required": true,
+                "nullable": true
+            },
+            "user_id": {
+                "type": "string",
+                "max_length": 255,
+                "description": "Line 用戶 ID",
+                "required": true,
+                "indexed": true
+            },
+            "created_at": {
+                "type": "datetime",
+                "description": "創建時間",
+                "default": "當前時間"
+            },
+            "status": {
+                "type": "string",
+                "max_length": 20,
+                "description": "待辦事項狀態",
+                "choices": [
+                    {"value": "pending", "label": "未完成"},
+                    {"value": "completed", "label": "完成"}
+                ],
+                "default": "pending"
+            }
+        }
+    },
+
+    "commands": {
+        "新增": {
+            "description": "新增待辦事項",
+            "format": "todo 新增 [事項名稱]",
+            "example": "todo 新增 買牛奶",
+            "parameters": {
+                "事項名稱": {
+                    "type": "string",
+                    "required": true,
+                    "description": "待辦事項的名稱"
+                }
+            },
+            "response": {
+                "success": "成功新增[事項名稱]",
+                "error": "新增失敗"
+            }
+        },
+        "刪除": {
+            "description": "刪除待辦事項",
+            "format": "todo 刪除 [事項名稱]",
+            "example": "todo 刪除 買牛奶",
+            "parameters": {
+                "事項名稱": {
+                    "type": "string",
+                    "required": true,
+                    "description": "要刪除的待辦事項名稱"
+                }
+            },
+            "response": {
+                "success": "成功刪除[事項名稱]",
+                "error": "當前事項不存在"
+            }
+        },
+        "修改": {
+            "description": "更新待辦事項狀態",
+            "format": "todo 修改 [事項名稱] [狀態]",
+            "example": "todo 修改 買牛奶 completed",
+            "parameters": {
+                "事項名稱": {
+                    "type": "string",
+                    "required": true,
+                    "description": "要修改的待辦事項名稱"
+                },
+                "狀態": {
+                    "type": "string",
+                    "required": true,
+                    "enum": ["completed", "pending"],
+                    "description": "新的狀態"
+                }
+            },
+            "response": {
+                "success": "已成功修改[事項名稱]為[狀態]",
+                "errors": {
+                    "not_found": "找不到該待辦事項",
+                    "invalid_status": "無效的狀態修改,請使用 completed 或是 pending",
+                    "same_status": "[事項名稱]已是[狀態]狀態了"
+                }
+            }
+        },
+        "列表": {
+            "description": "查看待辦清單",
+            "format": "todo 列表",
+            "example": "todo 列表",
+            "parameters": {},
+            "response": {
+                "success": {
+                    "format": "您的待辦清單如下\n1. [狀態圖示] [事項名稱]",
+                    "status_icons": {
+                        "completed": "✅",
+                        "pending": "⭕"
+                    }
+                },
+                "empty": "目前沒有待辦事項"
+            }
+        }
+    },
+
+    "error_responses": {
+        "invalid_command": {
+            "description": "無效的指令",
+            "response": "support_command_message()"
+        },
+        "missing_parameters": {
+            "description": "缺少參數",
+            "response": "support_command_message()"
+        }
+    },
+
+    "usage_examples": {
+        "new_todo": {
+            "command": "todo 新增 買牛奶",
+            "response": "成功新增買牛奶"
+        },
+        "complete_todo": {
+            "command": "todo 修改 買牛奶 completed",
+            "response": "已成功修改買牛奶為completed"
+        },
+        "delete_todo": {
+            "command": "todo 刪除 買牛奶",
+            "response": "成功刪除買牛奶"
+        },
+        "list_todos": {
+            "command": "todo 列表",
+            "response": "您的待辦清單如下\n1. ⭕ 買牛奶\n2. ✅ 寫作業"
+        }
+    },
+
+    "notes": {
+        "permissions": "每個用戶只能管理自己的待辦事項",
+        "limitations": [
+            "待辦事項名稱最長 50 字元",
+            "狀態只能是 completed 或 pending",
+            "不能新增重複名稱的待辦事項"
+        ],
+        "status_management": {
+            "completed": "表示事項已完成",
+            "pending": "表示事項待處理"
+        }
+    }
+}

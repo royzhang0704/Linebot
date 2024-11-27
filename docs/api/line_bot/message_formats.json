@@ -1,0 +1,60 @@
+{
+    "text_message": {
+        "description": "文字消息",
+        "format": {
+            "type": "text",
+            "id": "消息ID",
+            "text": "消息內容"
+        },
+        "example": {
+            "type": "text",
+            "id": "325708",
+            "text": "Hello, world!"
+        }
+    },
+    "image_message": {
+        "description": "圖片消息",
+        "format": {
+            "type": "image",
+            "id": "消息ID",
+            "contentProvider": {
+                "type": "line | external",
+                "originalContentUrl": "圖片URL",
+                "previewImageUrl": "預覽圖URL"
+            }
+        }
+    },
+    "video_message": {
+        "description": "影片消息",
+        "format": {
+            "type": "video",
+            "id": "消息ID",
+            "duration": "視頻長度（毫秒)",
+            "contentProvider": {
+                "type": "line | external",
+                "originalContentUrl": "影片URL",
+                "previewImageUrl": "預覽圖URL"
+            }
+        }
+    },
+    "sticker_message": {
+        "description": "貼圖消息",
+        "format": {
+            "type": "sticker",
+            "id": "消息ID",
+            "packageId": "貼圖包ID",
+            "stickerId": "貼圖ID"
+        }
+    },
+    "location_message": {
+        "description": "位置消息",
+        "format": {
+            "type": "location",
+            "id": "消息ID",
+            "title": "位置名稱",
+            "address": "詳細地址",
+            "latitude": "緯度",
+            "longitude": "經度"
+        }
+    }
+}

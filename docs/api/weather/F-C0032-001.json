@@ -1,0 +1,260 @@
+{
+    "api_info": {
+        "name": "一般天氣預報-今明36小時天氣預報",
+        "base_url": "https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-C0032-001",
+        "description": "取得中央氣象署36小時天氣預報資料",
+        "version": "v1",
+        "authentication": "需要 API 授權碼"
+    },
+
+    "request": {
+        "method": "GET",
+        "parameters": {
+            "Authorization": {
+                "type": "string",
+                "required": true,
+                "description": "API 授權碼",
+                "in": "query"
+            },
+            "locationName": {
+                "type": "string",
+                "required": false,
+                "description": "縣市名稱，例如：臺北市",
+                "in": "query"
+            }
+        }
+    },
+
+    "response": {
+        "success": {
+            "type": "object",
+            "properties": {
+                "success": {
+                    "type": "string",
+                    "description": "請求是否成功"
+                },
+                "records": {
+                    "type": "object",
+                    "properties": {
+                        "location": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "properties": {
+                                    "locationName": {
+                                        "type": "string",
+                                        "description": "縣市名稱"
+                                    },
+                                    "weatherElement": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "elementName": {
+                                                    "type": "string",
+                                                    "description": "天氣要素名稱",
+                                                    "enum": [
+                                                        "Wx",
+                                                        "PoP",
+                                                        "MinT",
+                                                        "MaxT",
+                                                        "CI"
+                                                    ]
+                                                },
+                                                "time": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "startTime": {
+                                                                "type": "string",
+                                                                "description": "開始時間"
+                                                            },
+                                                            "endTime": {
+                                                                "type": "string",
+                                                                "description": "結束時間"
+                                                            },
+                                                            "parameter": {
+                                                                "type": "object",
+                                                                "properties": {
+                                                                    "parameterName": {
+                                                                        "type": "string",
+                                                                        "description": "預報內容"
+                                                                    },
+                                                                    "parameterValue": {
+                                                                        "type": "string",
+                                                                        "description": "預報數值"
+                                                                    },
+                                                                    "parameterUnit": {
+                                                                        "type": "string",
+                                                                        "description": "單位"
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "example": {
+            "success": "true",
+            "records": {
+                "location": [
+                    {
+                        "locationName": "臺北市",
+                        "weatherElement": [
+                            {
+                                "elementName": "Wx",
+                                "time": [
+                                    {
+                                        "startTime": "2024-01-20T12:00:00+08:00",
+                                        "endTime": "2024-01-20T18:00:00+08:00",
+                                        "parameter": {
+                                            "parameterName": "晴時多雲",
+                                            "parameterValue": "2"
+                                        }
+                                    }
+                                ]
+                            },
+                            {
+                                "elementName": "PoP",
+                                "time": [
+                                    {
+                                        "startTime": "2024-01-20T12:00:00+08:00",
+                                        "endTime": "2024-01-20T18:00:00+08:00",
+                                        "parameter": {
+                                            "parameterName": "20",
+                                            "parameterUnit": "百分比"
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+
+    "weather_elements": {
+        "Wx": {
+            "description": "天氣現象",
+            "type": "string",
+            "examples": ["晴天", "陰時多雲"]
+        },
+        "PoP": {
+            "description": "降雨機率",
+            "type": "integer",
+            "unit": "百分比",
+            "range": "0-100"
+        },
+        "MinT": {
+            "description": "最低溫度",
+            "type": "integer",
+            "unit": "攝氏度"
+        },
+        "MaxT": {
+            "description": "最高溫度",
+            "type": "integer",
+            "unit": "攝氏度"
+        },
+        "CI": {
+            "description": "舒適度",
+            "type": "string",
+            "examples": ["舒適", "悶熱"]
+        }
+    },
+
+    "time_periods": {
+        "description": "預報時間區間",
+        "periods": [
+            "今日白天 (06:00-18:00)",
+            "今晚明晨 (18:00-06:00)",
+            "明日白天 (06:00-18:00)"
+        ]
+    },
+
+    "locations": {
+        "northern": [
+            "臺北市", "新北市", "基隆市",
+            "桃園市", "新竹市", "新竹縣"
+        ],
+        "central": [
+            "臺中市", "南投縣", "彰化縣",
+            "雲林縣", "苗栗縣"
+        ],
+        "southern": [
+            "高雄市", "臺南市", "嘉義市",
+            "嘉義縣", "屏東縣"
+        ],
+        "eastern": [
+            "宜蘭縣", "花蓮縣", "臺東縣"
+        ],
+        "islands": [
+            "澎湖縣", "金門縣", "連江縣"
+        ]
+    },
+
+    "error_responses": {
+        "401": {
+            "description": "認證失敗",
+            "example": {
+                "message": "Invalid API key"
+            }
+        },
+        "404": {
+            "description": "找不到資源",
+            "example": {
+                "message": "Resource not found"
+            }
+        },
+        "429": {
+            "description": "請求次數超過限制",
+            "example": {
+                "message": "Too many requests"
+            }
+        },
+        "500": {
+            "description": "服務器內部錯誤",
+            "example": {
+                "message": "Internal server error"
+            }
+        }
+    },
+
+    "notes": {
+        "update_frequency": "每六小時更新一次",
+        "time_zone": "時間為台北時區(UTC+8)",
+        "data_limitations": [
+            "預報資料可能有誤差",
+            "實際天氣狀況可能與預報不同",
+            "部分地區可能缺少某些預報要素"
+        ]
+    },
+
+    "usage_tips": {
+        "caching": [
+            "建議實作本地快取",
+            "快取時間可設定為3-6小時",
+            "特殊天氣狀況時應縮短快取時間"
+        ],
+        "error_handling": [
+            "處理 API 認證錯誤",
+            "處理無資料情況",
+            "處理網路連接問題"
+        ],
+        "data_processing": [
+            "注意時間區間的處理",
+            "溫度單位轉換",
+            "降雨機率的呈現方式"
+        ]
+    }
+}

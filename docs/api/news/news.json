@@ -1,0 +1,226 @@
+{
+    "api_info": {
+        "name": "News API - Everything endpoint",
+        "base_url": "https://newsapi.org/v2/everything",
+        "description": "搜尋新聞文章的 API",
+        "version": "v2",
+        "authentication": "需要 API Key",
+        "pricing": {
+            "free": "開發者計劃 - 每日 100 請求",
+            "paid": "依方案而定"
+        }
+    },
+
+    "request": {
+        "method": "GET",
+        "headers": {
+            "X-Api-Key": {
+                "type": "string",
+                "required": true,
+                "description": "API Key",
+                "in": "header"
+            }
+        },
+        "parameters": {
+            "q": {
+                "type": "string",
+                "required": true,
+                "description": "搜尋關鍵字",
+                "example": "bitcoin"
+            },
+            "language": {
+                "type": "string",
+                "required": false,
+                "description": "新聞語言",
+                "options": ["ar", "de", "en", "es", "fr", "he", "it", "nl", "no", "pt", "ru", "sv", "ud", "zh"],
+                "default": "en"
+            },
+            "sortBy": {
+                "type": "string",
+                "required": false,
+                "description": "排序方式",
+                "options": ["relevancy", "popularity", "publishedAt"],
+                "default": "publishedAt"
+            },
+            "pageSize": {
+                "type": "integer",
+                "required": false,
+                "description": "每頁顯示數量",
+                "min": 1,
+                "max": 100,
+                "default": 20
+            },
+            "page": {
+                "type": "integer",
+                "required": false,
+                "description": "頁數",
+                "min": 1,
+                "default": 1
+            }
+        }
+    },
+
+    "response": {
+        "success": {
+            "status": "ok",
+            "data_format": {
+                "status": {
+                    "type": "string",
+                    "description": "請求狀態",
+                    "possible_values": ["ok", "error"]
+                },
+                "totalResults": {
+                    "type": "integer",
+                    "description": "總結果數"
+                },
+                "articles": {
+                    "type": "array",
+                    "description": "新聞文章列表",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "source": {
+                                "type": "object",
+                                "properties": {
+                                    "id": {
+                                        "type": "string",
+                                        "description": "新聞來源 ID"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "description": "新聞來源名稱"
+                                    }
+                                }
+                            },
+                            "author": {
+                                "type": "string",
+                                "description": "作者"
+                            },
+                            "title": {
+                                "type": "string",
+                                "description": "標題"
+                            },
+                            "description": {
+                                "type": "string",
+                                "description": "描述"
+                            },
+                            "url": {
+                                "type": "string",
+                                "description": "文章URL"
+                            },
+                            "urlToImage": {
+                                "type": "string",
+                                "description": "圖片URL"
+                            },
+                            "publishedAt": {
+                                "type": "string",
+                                "description": "發布時間",
+                                "format": "ISO 8601"
+                            },
+                            "content": {
+                                "type": "string",
+                                "description": "文章內容"
+                            }
+                        }
+                    }
+                }
+            },
+            "example": {
+                "status": "ok",
+                "totalResults": 123,
+                "articles": [
+                    {
+                        "source": {
+                            "id": "bbc-news",
+                            "name": "BBC News"
+                        },
+                        "author": "BBC News",
+                        "title": "Example News Title",
+                        "description": "Example news description",
+                        "url": "https://www.bbc.com/news/example",
+                        "urlToImage": "https://example.com/image.jpg",
+                        "publishedAt": "2024-01-20T12:00:00Z",
+                        "content": "Example content text..."
+                    }
+                ]
+            }
+        },
+        "error": {
+            "status": "error",
+            "code": "string",
+            "message": "string"
+        }
+    },
+
+    "error_codes": {
+        "400": {
+            "description": "請求參數錯誤",
+            "example": {
+                "status": "error",
+                "code": "parametersMissing",
+                "message": "Required parameters are missing"
+            }
+        },
+        "401": {
+            "description": "未授權訪問",
+            "example": {
+                "status": "error",
+                "code": "apiKeyMissing",
+                "message": "Your API key is missing"
+            }
+        },
+        "429": {
+            "description": "請求次數超限",
+            "example": {
+                "status": "error",
+                "code": "rateLimited",
+                "message": "You have made too many requests"
+            }
+        },
+        "500": {
+            "description": "服務器錯誤",
+            "example": {
+                "status": "error",
+                "code": "serverError",
+                "message": "Server error"
+            }
+        }
+    },
+
+    "usage_tips": {
+        "best_practices": [
+            "實作請求緩存以避免重複請求",
+            "使用精確的搜尋關鍵字以獲得更相關的結果",
+            "合理設置 pageSize 以優化載入時間",
+            "注意處理圖片URL可能為空的情況"
+        ],
+        "rate_limiting": {
+            "free_tier": "每日 100 請求",
+            "handling": "使用計數器追蹤請求次數",
+            "tips": [
+                "實作本地緩存",
+                "錯誤重試機制",
+                "避免短時間內大量請求"
+            ]
+        },
+        "caching": {
+            "recommended_duration": "5-15 分鐘",
+            "strategy": "使用關鍵字+頁數作為緩存鍵",
+            "implementation": "使用本地存儲或 Redis"
+        }
+    },
+
+    "limitations": [
+        "免費版每日請求次數限制",
+        "某些新聞來源可能無法訪問",
+        "圖片URL可能失效",
+        "搜尋結果可能有延遲"
+    ],
+
+    "notes": {
+        "content_length": "content 欄位可能被截斷",
+        "image_urls": "需要處理圖片URL可能不存在的情況",
+        "time_format": "所有時間都是 UTC 格式",
+        "language_support": "並非所有語言都有完整支援"
+    }
+}

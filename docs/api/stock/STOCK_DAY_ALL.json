@@ -1,0 +1,159 @@
+{
+    "api_info": {
+        "name": "個股日成交資訊 API",
+        "base_url": "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL",
+        "description": "取得所有上市股票當日成交資訊",
+        "method": "GET",
+        "update_frequency": "每日更新",
+        "data_delay": "20分鐘"
+    },
+
+    "request": {
+        "method": "GET",
+        "parameters": "無需參數",
+        "authentication": "無需認證"
+    },
+
+    "response": {
+        "data_type": "array",
+        "data_format": {
+            "Code": {
+                "type": "string",
+                "description": "股票代號",
+                "example": "2330"
+            },
+            "Name": {
+                "type": "string",
+                "description": "股票名稱",
+                "example": "台積電"
+            },
+            "TradeVolume": {
+                "type": "string",
+                "description": "成交股數",
+                "example": "38,245,127"
+            },
+            "TradeValue": {
+                "type": "string",
+                "description": "成交金額",
+                "example": "23,132,452,589"
+            },
+            "OpeningPrice": {
+                "type": "string",
+                "description": "開盤價",
+                "example": "601.00"
+            },
+            "HighestPrice": {
+                "type": "string",
+                "description": "最高價",
+                "example": "606.00"
+            },
+            "LowestPrice": {
+                "type": "string",
+                "description": "最低價",
+                "example": "601.00"
+            },
+            "ClosingPrice": {
+                "type": "string",
+                "description": "收盤價",
+                "example": "605.00"
+            },
+            "Change": {
+                "type": "string",
+                "description": "漲跌價差",
+                "example": "2.00"
+            },
+            "Transaction": {
+                "type": "string",
+                "description": "成交筆數",
+                "example": "51,889"
+            }
+        },
+
+        "example_response": [
+            {
+                "Code": "2330",
+                "Name": "台積電",
+                "TradeVolume": "38,245,127",
+                "TradeValue": "23,132,452,589",
+                "OpeningPrice": "601.00",
+                "HighestPrice": "606.00",
+                "LowestPrice": "601.00",
+                "ClosingPrice": "605.00",
+                "Change": "2.00",
+                "Transaction": "51,889"
+            },
+            {
+                "Code": "2317",
+                "Name": "鴻海",
+                "TradeVolume": "15,245,127",
+                "TradeValue": "1,532,452,589",
+                "OpeningPrice": "101.00",
+                "HighestPrice": "102.00",
+                "LowestPrice": "100.50",
+                "ClosingPrice": "101.50",
+                "Change": "0.50",
+                "Transaction": "12,345"
+            }
+        ]
+    },
+
+    "error_responses": {
+        "404": {
+            "description": "找不到資源",
+            "example": {
+                "error": "Resource not found"
+            }
+        },
+        "429": {
+            "description": "請求次數超過限制",
+            "example": {
+                "error": "Too many requests"
+            }
+        },
+        "500": {
+            "description": "服務器內部錯誤",
+            "example": {
+                "error": "Internal server error"
+            }
+        }
+    },
+
+    "notes": {
+        "data_format": {
+            "數值格式": "所有數值皆為字串格式",
+            "價格單位": "新台幣元",
+            "數字表示": "千分位使用逗號分隔",
+            "漲跌表示": "Change 欄位為正數表示上漲，負數表示下跌"
+        },
+        "special_cases": [
+            "當股票暫停交易時，價格相關欄位可能為空值",
+            "若該股票當日未成交，仍會出現在列表中，但成交量和成交值為0",
+            "OpeningPrice 可能為空值，表示當日未開盤",
+            "收盤價為 0 時，表示當日未成交"
+        ],
+        "time_info": {
+            "data_date": "交易日當天",
+            "time_zone": "時間以台北時區（UTC+8）為準",
+            "update_time": "收盤後更新"
+        },
+        "rate_limits": {
+            "description": "API 呼叫頻率限制",
+            "limit": "每分鐘 600 次請求",
+            "note": "超過限制將返回 429 錯誤"
+        }
+    },
+
+    "usage_tips": {
+        "best_practices": [
+            "建議實作快取機制，減少重複請求",
+            "可以使用 Change 欄位判斷股價漲跌",
+            "數值運算前需要先移除千分位符號",
+            "建議在非交易時間進行大量資料獲取"
+        ],
+        "performance_tips": [
+            "回應資料量較大，建議實作分頁處理",
+            "可以根據需求只處理必要的欄位",
+            "建議實作錯誤重試機制"
+        ]
+    }
+}
