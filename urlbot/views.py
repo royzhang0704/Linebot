@@ -1,5 +1,3 @@
-from urllib.parse import uses_relative
-
 import requests
 from django.core.serializers import serialize
 from django.core.validators import URLValidator
@@ -887,11 +885,16 @@ class TodoList:
 
     def delete_todo(self,input,user_id):
         """刪除todo物件"""
+
         #一次刪除全部
         if input[2]=="全部":
             todo=Todolist.objects.filter(user_id=user_id)
-            todo.delete()
-            return f"代辦事項已全部刪除"
+
+            if todo:
+                todo.delete()
+                return f"代辦事項已全部刪除"
+
+            return "當前代辦事項已經為空 不需要刪除!"
 
         todo = Todolist.objects.filter(user_id=user_id, title=input[2]).first()
 
@@ -923,7 +926,7 @@ class TodoList:
         todo.status = new_status
         todo.save()
         serializer = TodoListSerializer(todo)
-        response_text = f"已成功修改{serializer.data['title']}為{serializer.data['status']}"
+        response_text = f"已成功把{serializer.data['title']}修改為 {serializer.data['status']}狀態了!"
 
         return response_text
 
