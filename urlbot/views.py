@@ -1,3 +1,5 @@
+from urllib.parse import uses_relative
+
 import requests
 from django.core.serializers import serialize
 from django.core.validators import URLValidator
@@ -121,19 +123,26 @@ class LineBotCallbackAPI(APIView):
         response = self.shortener.get_shorten_url(input_parts[1])
         return response if isinstance(response, str) else f"對應的縮網址：{response}"
 
-    def _handle_currency(self,input_part):
+    def _handle_currency(self,input):
         """處理匯率指令"""
         if len(input) < 3:
-            return "請輸入正確格式 匯率 [原幣別] [目標幣別] 例如 美金 台幣",
-        currency1, currency2 = input_part[1],input_part[2]
+            return (
+            "說明: 查詢即時匯率轉換\n",
+            "格式: 匯率 [原幣別] [目標幣別]\n"
+            "範例: 匯率 美金 台幣"
+            )
+        currency1, currency2 = input[1],input[2]
         response = self.currency_transform.get_result(currency1, currency2)
         return response if isinstance(response,str) else f"當前 1 {currency1} 可以兌換 {response} {currency2}"
 
     def _handle_stock(self,input_part):
         """處理股票指令"""
         if len(input_part) < 2:  # 檢查輸入長度
-            return "請輸入股票代碼 例如 股票 2330"
-
+            return (
+                "說明: 查詢股票即時資訊\n"
+                "格式: 股票 [股票代碼]\n"
+                "範例: 股票 2330\n"
+                )
         if not input_part[1]:
             return support_command_message()
 
@@ -167,13 +176,17 @@ class LineBotCallbackAPI(APIView):
     def _handle_news(self,input):
         """處理新聞指令"""
         if len(input)<2:
-            return "請輸入要查詢的新聞關鍵字 例如 新聞 棒球"
+            return (
+            "說明: 搜尋相關新聞\n"
+            "格式: 新聞 [關鍵字]\n"
+            "範例: 新聞 財金\n"
+            )
         keyword=input[1]
         return self.news.get_new_article(keyword)
 
     def _handle_todolist(self, input, user_id):
         """處理待辦事項指令"""
-        if len(input) < 2:
+        if len(input)<2:
             return (
                 "請輸入正確的待辦事項指令\n"
                 "支援的指令：\n"
@@ -312,10 +325,10 @@ class CurrencyTransformAPI:
         '英鎊': 'GBP',
         '韓元': 'KRW',
     }
-        self.support_text="美金,台幣,日幣,人民幣,越南盾,英鎊,韓元" #未來更好擴充 不要用應編碼
-    def _validate_input(self,input1,input2):
+        self.support_text="美金,台幣,日幣,人民幣,越南盾,英鎊,韓元" #未來更好擴充 不要用硬編碼
+    def _validate_input(self,input_currency1,input_currency2):
         """驗整輸入在支援內"""
-        if input1 not in self.text or input2 not in self.text:
+        if input_currency1 not in self.text or input_currency2 not in self.text:
             return f"當前支援的貨幣有{self.support_text}"
 
         return True
@@ -341,21 +354,21 @@ class CurrencyTransformAPI:
             }
             return f"代碼錯誤-{status_code}-{error_mapping.get(status_code)}-{e}"
 
-    def _handle_response(self,response,input1,input2):
+    def _handle_response(self,response,currency1,currency2):
         try:
             data=response.json()
-            usd_to_input1_rate = float(data.get(f"USD{self.text[input1]}")['Exrate'])
-            usd_to_input2_rate = float(data.get(f"USD{self.text[input2]}")['Exrate'])
-            return round(usd_to_input2_rate / usd_to_input1_rate, 4)
+            usd_to_currency1_rate = float(data.get(f"USD{self.text[currency1]}")['Exrate'])
+            usd_to_currency2_rate = float(data.get(f"USD{self.text[currency2]}")['Exrate'])
+            return round(usd_to_currency2_rate / usd_to_currency1_rate, 4)
 
         except (KeyError,ValueError) as e:
             return  (f"無效響應格式{str(e)}")
 
-    def get_result(self,input1,input2):
+    def get_result(self,currency1,currency2):
         try:
             #檢查使用者輸入
-            validate_result=self._validate_input(input1,input2)
-            if  validate_result is not True:
+            validate_result=self._validate_input(currency1,currency2)
+            if validate_result is not True:
                 return  validate_result
 
             #驗證請求
@@ -364,11 +377,11 @@ class CurrencyTransformAPI:
                 return response
 
             #處理響應
-            return self._handle_response(response,input1,input2)
+            return self._handle_response(response,currency1,currency2)
 
         #未知錯誤
         except Exception as e:
-            raise f"未預期錯誤{str(e)}"
+            return  f"未預期錯誤{str(e)}"
 
 class WeatherAPI:
     """
@@ -839,13 +852,18 @@ class TodoList:
 
     def handle_command(self, input_parts, user_id) -> str:
         """處理待辦事項指令"""
-        if len(input_parts) < 2:
-            return support_command_message()
 
         command = input_parts[1]
-        if command not in self.commands:
-            return support_command_message()
 
+        if (command!="列表" and len(input_parts)<3) or command not in self.commands:
+            return   (
+                "說明: 待辦事項管理\n"
+                "子指令\n"
+                "列表: 查看所有待辦事項\n"
+                "新增: 新增待辦事項 (todo 新增 [事項名稱])\n"
+                "刪除: 刪除待辦事項 (todo 刪除 [事項名稱])\n"
+                "修改: 更改待辦狀態 (todo 修改 [事項名稱] completed/pending)\n"
+                )
         handler = self.commands[command]
         return handler(input_parts, user_id)
 
@@ -857,15 +875,23 @@ class TodoList:
         }
 
         serializer=TodoListSerializer(data=data)
+        todo=Todolist.objects.filter(user_id=user_id,title=input[2]).first()
+        if todo:
+            return f"{todo.title}已存在 無法重複新增"
+
         if serializer.is_valid():
             todo=serializer.save()
             return f"成功新增{todo.title}"
 
-        else:
-            return "新增失敗"
+        return "新增失敗"
 
     def delete_todo(self,input,user_id):
         """刪除todo物件"""
+        #一次刪除全部
+        if input[2]=="全部":
+            todo=Todolist.objects.filter(user_id=user_id)
+            todo.delete()
+            return f"代辦事項已全部刪除"
 
         todo = Todolist.objects.filter(user_id=user_id, title=input[2]).first()
 
@@ -878,6 +904,8 @@ class TodoList:
 
     def update_todo(self,input,user_id):
         """更新代辦事項的狀態"""
+        if len(input)<4:
+            return "請輸入要修改的狀態 請使用completed 或是 pending"
 
         todo = Todolist.objects.filter(user_id=user_id, title=input[2]).first()
 
