@@ -4,7 +4,7 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from linebot.models import TextSendMessage, MessageEvent
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK
+from rest_framework  import status
 from rest_framework.views import APIView
 from linebot import LineBotApi, WebhookParser
 from django.conf import settings
@@ -52,7 +52,15 @@ class LineBotCallbackAPI(APIView):
             "新聞": self._handle_news,
             "todo": self._handle_todolist
         }
-
+    def get(self,request,*args,**kwargs):
+        """測試API是否成功"""
+        return Response(
+            {
+                "success":True,
+                "message":"連接成功"
+            }
+            ,status=status.HTTP_200_OK)
+    
     def post(self, request, *args, **kwargs):
         """處理 Line webhook 請求"""
 
@@ -75,7 +83,7 @@ class LineBotCallbackAPI(APIView):
                     TextSendMessage(text=response_text)
                 )
 
-        return Response({'result': 'ok'}, status=HTTP_200_OK)
+        return Response({'result': 'ok'}, status=status.HTTP_200_OK)
 
     def _handle_message(self, event):
         """處理用戶發送的消息
@@ -135,14 +143,12 @@ class LineBotCallbackAPI(APIView):
 
     def _handle_stock(self,input_part):
         """處理股票指令"""
-        if len(input_part) < 2:  # 檢查輸入長度
+        if len(input_part) < 2:  # 只輸入指令 沒有股票代碼
             return (
                 "說明: 查詢股票即時資訊\n"
                 "格式: 股票 [股票代碼]\n"
                 "範例: 股票 2330\n"
                 )
-        if not input_part[1]:
-            return support_command_message()
 
         if input_part[1] == "外資持股":
             return  self.stock.get_foreign_holdings_info()
@@ -150,6 +156,7 @@ class LineBotCallbackAPI(APIView):
         elif input_part[1] == "每日成交":
             return self.stock.get_MI_INDEX20()
 
+        #個股資訊
         else:
             return self.stock.get_stock_full_info(input_part[1])
 
@@ -597,8 +604,8 @@ class StockAPI:
            stock_info = api.get_stock_full_info("2330")
        """
     def __init__(self):
-        self.url_fund_MI_QFIIS_sort_20 = "https://openapi.twse.com.tw/v1/fund/MI_QFIIS_sort_20"  # 集中市場外資及陸資持股前5名統計表 ok
-        self.url_MI_INDEX20="https://openapi.twse.com.tw/v1/exchangeReport/MI_INDEX20" #集中市場每日成交量前5名證券 ok
+        self.url_fund_MI_QFIIS_sort_20 = "https://openapi.twse.com.tw/v1/fund/MI_QFIIS_sort_20"  # 集中市場外資及陸資持股前5名統計表
+        self.url_MI_INDEX20="https://openapi.twse.com.tw/v1/exchangeReport/MI_INDEX20" #集中市場每日成交量前5名證券
         self.url_BWIBBU_ALL="https://openapi.twse.com.tw/v1/exchangeReport/BWIBBU_ALL" #個股基本資料(含收盤價、本益比、股價淨值比)
         self.url_STOCK_DAY_ALL= "https://openapi.twse.com.tw/v1/exchangeReport/STOCK_DAY_ALL"# 個股日成交資訊
 
